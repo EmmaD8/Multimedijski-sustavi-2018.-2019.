@@ -101,11 +101,9 @@ void setup()
 
 void draw()
 {
-  //if (flag)
-      scene();
+  scene();
   scrollRect.display();
   scrollRect.update();
-  //noLoop();
 }
 
 void scene() {
@@ -178,8 +176,9 @@ void scene() {
   //prikazujemo sve potpise za jednog studenta
   if (klik == 2){
     background(255);
+    String[] lines = loadStrings(dataPath("") + "/" + imeNovogPredmeta + ".txt");
     // we'll have a look in the data folder
-    java.io.File folder = new java.io.File(dataPath("") + "/" + imeNovogPredmeta + "/student" + redni_br);
+    java.io.File folder = new java.io.File(dataPath("") + "/" + imeNovogPredmeta + "/" + lines[redni_br+1]);
      
     // list the files in the data folder
     String[] filenames = folder.list();
@@ -193,7 +192,7 @@ void scene() {
     for (int i = 0; i < filenames.length; i++) {
       //println(filenames[i]);
       //potpis = loadImage(absPath + "/student" + redni_br + "/" + filenames[i]);
-      potpisi[i] = loadImage(dataPath("") + "/" + imeNovogPredmeta + "/student" + redni_br + "/" + filenames[i]);
+      potpisi[i] = loadImage(dataPath("") + "/" + imeNovogPredmeta + "/" + lines[redni_br+1] + "/" + filenames[i]);
     }
     
     for (int i = 0; i < filenames.length; i++){
@@ -249,6 +248,9 @@ void fileSelected2(File selection) {
   else {
     println("User selected " + selection.getAbsolutePath());
 
+    trenutna_slika = 1;
+    trenutni_red = 2;
+
     pdf = selection.getAbsolutePath();
     
     //size(2480, 3507); 
@@ -260,6 +262,8 @@ void fileSelected2(File selection) {
       
         document = PDDocument.load( new File(pdf) );
         printer = new SaveImagesInPdf();
+        printer.imageNumber = 1;
+        
         int pageNum = 0;
         for( PDPage page : document.getPages() )
         {
@@ -304,7 +308,7 @@ void izreziKlikanjem(Point gornji_lijevi, Point gornji_lijevi2, int duljina, int
   
   int br = Integer.parseInt(lines[1]);
 
-  while(trenutni_red < lines.length)
+  while(trenutni_red < lines.length && i < br)
   {
     if(flag)
     {
@@ -314,12 +318,16 @@ void izreziKlikanjem(Point gornji_lijevi, Point gornji_lijevi2, int duljina, int
        
        PImage img2 = img.get((int)(gornji_lijevi.getX()), (int)(gornji_lijevi.getY()+ i * visina), duljina, visina);     
        i++;
+       println ("predavanje" + predavanje_br);
        img2.save(absPath + "/" + lines[trenutni_red] + "/" + predavanje_br +".png");
-       if(i >= br) flag = false;
+       if(i >= br) {
+         flag = false;
+         i = 0;
+       }
        }  
     }
     
-    if(!flag)
+    else if(!flag)
     {
        if (absPath != null){
        File f = new File(absPath + "/" + lines[trenutni_red]);
@@ -328,7 +336,10 @@ void izreziKlikanjem(Point gornji_lijevi, Point gornji_lijevi2, int duljina, int
        PImage img2 = img.get((int)(gornji_lijevi2.getX()), (int)(gornji_lijevi2.getY() + i * visina), duljina, visina);   
        i++;
        img2.save(absPath + "/" + lines[trenutni_red] + "/" + predavanje_br +".png");
-       if(i >= br) flag = true;
+       
+       /*if(i >= br){
+         flag = true;
+       }*/
        }  
     }
     
@@ -368,8 +379,8 @@ void mouseClicked(){
                        (float)gornji_lijevi2.getX(), (float)gornji_lijevi2.getY()));
     
     gornji_lijevi2 = new Point((int)gornji_lijevi.getX() + d, (int)gornji_lijevi.getY());
-    
-    img = loadImage("C:/Users/emdogan/Desktop/projekt/data/image_" + trenutna_slika + ".png");
+
+    img = loadImage("C:/Users/Ema/Desktop/projekt/data/image_" + trenutna_slika + ".png");
     izreziKlikanjem(gornji_lijevi, gornji_lijevi2, duljina, visina);
     
     brojac = 0;
@@ -401,7 +412,7 @@ void rotiraj()
   
   popMatrix();
   
-  File file = new File("C:/Users/emdogan/Desktop/projekt/data/image_1.png");
+  File file = new File("C:/Users/Ema/Desktop/projekt/data/image_1.png");
   
   BufferedImage sl_rot = null;
   try {

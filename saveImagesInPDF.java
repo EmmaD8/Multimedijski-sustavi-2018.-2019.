@@ -75,7 +75,7 @@ class SaveImagesInPdf extends PDFStreamEngine
               
               try{                
                   //File file = new File("C:/Users/emdogan/Downloads/image_" + imageNumber + ".png");
-                  File file = new File("C:/Users/emdogan/Desktop/projekt/data/image_" + imageNumber + ".png");
+                  File file = new File("C:/Users/Ema/Desktop/projekt/data/image_" + imageNumber + ".png");
                 // rotiramo sliku zato što bude položena kad ju izvadimo iz PDF-a
                   
                 int w = bImage.getWidth();

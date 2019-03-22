@@ -21,6 +21,8 @@ public class MyPanel extends JPanel {
   private JLabel label;
   private JLabel label2;
   private JLabel label3; 
+  private JLabel label4;
+  private JLabel label5;
   
   public MyPanel() {
     
@@ -32,11 +34,13 @@ public class MyPanel extends JPanel {
     ispisi = new JButton ("Ispišite sve potpise odabranog studenta");
     svi = new JButton ("Uvid u sve studente i njihove prisutnosti");
     dodajStudenta = new JButton ("Dodaj novog studenta");
-    dodajPredmet = new JButton ("Dodaj novog studenta");
+    dodajPredmet = new JButton ("Dodaj novi kolegij");
     
-    label = new JLabel("Redni broj na popisu odabranog studenta");
+    label = new JLabel("Redni broj na popisu odabranog studenta:");
     label2 = new JLabel("Unosite popis za predavanje redni broj: ");
-    label3 = new JLabel("Broj studenata u prvom stupcu");
+    label3 = new JLabel("Broj studenata u prvom stupcu:");
+    label4 = new JLabel("Ime kolegija:");
+    label5 = new JLabel("Ime i prezime:");
     
     redniBr = new JTextArea();
     predavanje = new JTextArea();
@@ -162,7 +166,7 @@ public class MyPanel extends JPanel {
 
 
     //adjust size and set layout
-    setPreferredSize (new Dimension (500, 650));
+    setPreferredSize (new Dimension (500, 325));
     setLayout (null);
 
     //add components
@@ -183,31 +187,34 @@ public class MyPanel extends JPanel {
 
     add (imePredmeta);
     add (dodajPredmet);
+    add (label4);
+    add (label5);
     
     //set component bounds (only needed by Absolute Positioning)
     //x, y, width, height
+   
+    label4.setBounds(25,25, 250, 20);
+    imePredmeta.setBounds(105, 25, 125, 20);
+    dodajPredmet.setBounds(270, 25, 200, 20);
     
-    label3.setBounds (5, 5, 250, 20);
-    brStudenata.setBounds (250, 5, 40, 20);
+    label3.setBounds(25, 60, 250, 20);
+    brStudenata.setBounds(215, 60, 125, 20);
     
-    unesi.setBounds (140, 50, 220, 40);
+    label2.setBounds(25, 95, 250,20);
+    predavanje.setBounds(255, 95, 125, 20);
     
-    label2.setBounds (5, 120, 250, 20);
-    predavanje.setBounds (250, 120, 40, 20);
+    unesi.setBounds(25, 130, 210, 20);
+    slika.setBounds(260,130, 210, 20);
     
-    slika.setBounds (140, 170, 220, 40);
+    label5.setBounds(25, 165, 250, 20);
+    imeStudenta.setBounds(115, 165, 140, 20);
+    dodajStudenta.setBounds(270, 165, 200, 20);
     
-    svi.setBounds (100, 240, 300, 40);
+    svi.setBounds(25, 200, 300, 20);
     
-    label.setBounds (5, 315, 250, 20);
-    redniBr.setBounds (250, 315, 40, 20);
-    ispisi.setBounds (100, 360, 300, 30);
-    
-    imeStudenta.setBounds (5, 400, 250, 30);
-    dodajStudenta.setBounds (260, 400, 220, 30);
-    
-    imePredmeta.setBounds (5, 460, 250, 30);
-    dodajPredmet.setBounds (260, 460, 220, 30);
+    label.setBounds(25, 235, 250, 20);
+    redniBr.setBounds(270, 235, 125, 20);
+    ispisi.setBounds(25, 270, 300, 20);
   }
   
 }
