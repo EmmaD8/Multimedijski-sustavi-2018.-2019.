@@ -48,8 +48,9 @@ int predavanje_br = 0;
 
 String imeNovogPredmeta = "";
 
-//
-int br_studenata;
+//zapis po stranicama koliko ima redaka u jednoj tablici odvojeno razmacima
+// npr. "30 10" na prvoj stranici iz pdfa ima 30 redaka, na drugoj ima 10
+String br_studenata;
 
 //za dodavanje novog studenta -- ime koje ce pisati u textarea
 String imeNovog = "";
@@ -234,7 +235,7 @@ void fileSelected(File selection) {
     
     String[] lines = new String[2];
     lines[0] = absPath;
-    lines[1] = Integer.toString(br_studenata);
+    lines[1] = br_studenata;
     
     File f = new File(dataPath("") + "/" + imeNovogPredmeta + ".txt");
     saveStrings(f, lines);
@@ -306,8 +307,9 @@ void izreziKlikanjem(Point gornji_lijevi, Point gornji_lijevi2, int duljina, int
   boolean flag = true;
   int i = 0;
   
-  int br = Integer.parseInt(lines[1]);
-
+  String[] brojevi = lines[1].split(" ");
+  int br = Integer.parseInt(brojevi[trenutna_slika - 1]);
+  
   while(trenutni_red < lines.length && i < br)
   {
     if(flag)
@@ -318,7 +320,7 @@ void izreziKlikanjem(Point gornji_lijevi, Point gornji_lijevi2, int duljina, int
        
        PImage img2 = img.get((int)(gornji_lijevi.getX()), (int)(gornji_lijevi.getY()+ i * visina), duljina, visina);     
        i++;
-       println ("predavanje" + predavanje_br);
+       //println ("predavanje" + predavanje_br);
        img2.save(absPath + "/" + lines[trenutni_red] + "/" + predavanje_br +".png");
        if(i >= br) {
          flag = false;
@@ -363,7 +365,7 @@ void mouseClicked(){
     
     String[] lines = loadStrings(dataPath("") + "/" + imeNovogPredmeta + ".txt");
   
-    int br = Integer.parseInt(lines[1]);
+    int br = Integer.parseInt((lines[1].split(" "))[0]);
 
     
     if (duljina == 0)

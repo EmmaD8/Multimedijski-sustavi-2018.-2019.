@@ -106,19 +106,19 @@ public class MyPanel extends JPanel {
         @Override
         public void removeUpdate(DocumentEvent e) {
           if ( !brStudenata.getText().equals("") )
-            br_studenata = Integer.parseInt(brStudenata.getText());
+            br_studenata = brStudenata.getText();
         }
 
         @Override
         public void insertUpdate(DocumentEvent e) {
           if ( !brStudenata.getText().equals("") )
-              br_studenata = Integer.parseInt(brStudenata.getText());        
+              br_studenata = brStudenata.getText();        
         }
 
         @Override
         public void changedUpdate(DocumentEvent arg0) {
           if ( !brStudenata.getText().equals("") )
-              br_studenata = Integer.parseInt(brStudenata.getText());        
+              br_studenata = brStudenata.getText();        
         }
     });
 
