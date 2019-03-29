@@ -6,7 +6,6 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.*;
-
 import processing.serial.*;
 
 import java.awt.image.BufferedImage;
@@ -18,14 +17,10 @@ import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform; 
 
-String path="";
-// predstavljaju početak linije na x osi i kraj linije, tj. ukupne tablice
-
+//točke koje korisnik određuje klikanjem po slici
 Point gornji_lijevi, gornji_desni, donji_lijevi, gornji_lijevi2;
 
 int visina_celije = 0;
-
-int lijevi_gornji;
 float newYValue = 0;
 
 PImage img;
@@ -34,7 +29,6 @@ File folder;
 String absPath;
 String pdf;
 
-//float koef = 2480/595;
 float koef = 1;
 
 SaveImagesInPdf printer;
@@ -59,8 +53,6 @@ int brojac = 1;
 
 MyPanel controlPanel;
 
-color paper = color(0);
-
 int klik = 0;
 boolean flag = false;
 
@@ -71,6 +63,7 @@ float heightOfCanvas = 3507*2;  // realHeight of the entire scene
 
 PImage[] potpisi;
 
+//brojaci slika iz pdf-a i retka koji izrezujemo
 int trenutna_slika = 1;
 int trenutni_red = 2;
 
@@ -80,9 +73,6 @@ int duljina = 0;
 
 void setup()
 {
-  //size(397, 561);
-  //size(595, 842); 
-  //size(2480, 3507);
   size(1240, 1753);
   
   scrollRect = new ScrollRect();
@@ -113,107 +103,107 @@ void scene() {
   // reading scroll bar 
   newYValue = scrollRect.scrollValue();  
   translate (0, newYValue);
- 
-  // The scene :
-  
+
+  //zelimo pogledati prisutnost svih studenata na odredenom kolegiju po predavanjima
   if (klik == 1){
     background(255);
-    
-    //String[] lines = loadStrings(dataPath("") + "/" + imeNovogPredmeta + ".txt");
-    //println(lines[0]);
 
-    //folder u kojem se nalaze ostali folderi
-    //java.io.File studenti = new java.io.File(lines[0]);
-    java.io.File studenti = new java.io.File(dataPath("") + "/" + imeNovogPredmeta);
-  
-    String[] foldernames = studenti.list();
-    Arrays.sort(foldernames);
+    String[] studenti = loadStrings(dataPath("") + "/" + imeNovogPredmeta + ".txt");
     
+    absPath = studenti[0];
     
+    //rucno crtamo tablicu
     for (int i = 0; i < 13; i++){
-        line(i * 31 + 115, 0, i * 31 + 115, foldernames.length * 40);
+        line(i * 31 + 200, 0, i * 31 + 200, (studenti.length - 1) * 25 + 2);
         fill(0);
         textSize(15);
-        text("" + (i + 1), i * 30 + 125, 5, 100, 20); 
+        text("" + (i + 1), i * 30 + 215, 5, 100, 20); 
     }
-    line(13 * 31 + 115, 0, 13 * 31 + 115, foldernames.length * 40);
+    line(13 * 31 + 200, 0, 13 * 31 + 200, (studenti.length - 1) * 25 + 2);
     
-    for (int i = 0; i < foldernames.length; i++){
+    
+    for (int i = 0; i < (studenti.length - 2); i++){
       //stroke(0);
       fill(0);
       textSize(15);
-      text(foldernames[i], 25, (i + 1) * 25 + 5, 100, 25);
-      line(0, (i + 1) * 25 + 2, 520, (i + 1) * 25 + 2); 
-      
-      java.io.File student = new java.io.File(dataPath("") + "/" + imeNovogPredmeta + "/" + foldernames[i]);
-      
-      // za svaki folder gledamo potpise u njemu
-      String[] potpisi = student.list();
-      
-      Arrays.sort(potpisi);
+      text((i + 1) + ". " + studenti[i + 2], 25, (i + 1) * 25 + 5, 200, 25);
+      line(0, (i + 1) * 25 + 2, 603, (i + 1) * 25 + 2); 
       
       //potpisi u svakom folderu su oblika 1.png, ... 13.png
             
-      //ako je taj student bio na predavanju j u folderu će biti slika s imenom j.png
-      //i onda stavimo x da je bio prisutan, inače ne pišemo ništa
+      //stavimo x da je bio prisutan, inače ne pišemo ništa
       for (int j = 0; j < 13; j++){
         
         try{
+          File f = new File(absPath + "/" + studenti[i + 2] + "/" + (j + 1) + ".png");
+          if (f.exists()){
+            //učitavamo redom
+            PImage im = loadImage(absPath + "/" + studenti[i + 2] + "/" + (j + 1) + ".png");
           
-          PImage im = loadImage(dataPath("") + "/" + imeNovogPredmeta + "/" + foldernames[i] + "/" + potpisi[j]);
-        
-          if (imaLiPotpisa(im) )
-            text("x", j * 30 + 120, (i + 1) * 25 + 5, 100, 20);    
-          
+            if (imaLiPotpisa(im) )
+              text("x", j * 30 + 215, (i + 1) * 25 + 5, 100, 20);    
+          }
         }catch(Exception e){}
          
       }
   
     }
-    line(0, (foldernames.length + 1) * 25 + 2, 520, (foldernames.length + 1) * 25 + 2); 
-  }  
+    line(0, (studenti.length - 1) * 25 + 2, 603, (studenti.length - 1) * 25 + 2); 
+}  
   
 
-  //prikazujemo sve potpise za jednog studenta
+  //prikazujemo sve potpise za JEDNOG studenta -- čiji je redni broj korisnik odabrao
   if (klik == 2){
     background(255);
     String[] lines = loadStrings(dataPath("") + "/" + imeNovogPredmeta + ".txt");
-    // we'll have a look in the data folder
-    java.io.File folder = new java.io.File(dataPath("") + "/" + imeNovogPredmeta + "/" + lines[redni_br+1]);
+    absPath = lines[0];
+    
+    //u lines imamo sva imena i prezimena studenata -- njihovi folderi s potpisima
+    // se zovu isto tako
+    //tu samo ulazimo u folder s odabranim imenom -- njegov redni br je spremljen
+    //u varijablu redni_br -- počinje od 1
+    //lines ide od 0, a imena se nalaze od 2. linije u lines
+    //zato čitamo ime iz linije redni_br + 1
+    java.io.File folder = new java.io.File(absPath + "/" + lines[redni_br+1]);
      
-    // list the files in the data folder
+    // izlista sva imena file-ova u folderu odabranog studenta
     String[] filenames = folder.list();
      
-    // get and display the number of jpg files
-    println(filenames.length + " jpg files in specified directory");
-     
+    // tu vidimo broj slika u folderu -- više za provjeru
+    //println(filenames.length + " jpg files in specified directory");
+    
+    //potpisi je polje slika u koje ćemo spremiti sve file-ove iz tog foldera
+    //u folderu se nalaze fileovi oblika 1.png, 2.png ...
+    //slike za svako predavanje
     potpisi = new PImage[filenames.length]; 
     
-    // display the filenames
+    // učitamo potpise
     for (int i = 0; i < filenames.length; i++) {
-      //println(filenames[i]);
-      //potpis = loadImage(absPath + "/student" + redni_br + "/" + filenames[i]);
-      potpisi[i] = loadImage(dataPath("") + "/" + imeNovogPredmeta + "/" + lines[redni_br+1] + "/" + filenames[i]);
+      potpisi[i] = loadImage(absPath + "/" + lines[redni_br+1] + "/" + filenames[i]);
     }
     
+    //ispisujemo potpise, po 2
     for (int i = 0; i < filenames.length; i++){
+      //ispisujemo sve potpise, čak i ako su prazni
+      //ako to ne želimo, samo treba otkomentirati iduću liniju
+      
+      //if (imaLiPotpisa(potpisi[i])
       if ( i % 2 == 0)
           image(potpisi[i], 0, i * potpisi[i].height + 10);
       else
           image(potpisi[i], potpisi[i].width + 20, (i - 1) * potpisi[i].height + 10);
     }
-    //flag = false;
-    //klik = 0;
   }
 
   if (obrada_slike && trenutna_slika < printer.imageNumber){
-        img = loadImage(path + "image_" + trenutna_slika + ".png");
+        img = loadImage(dataPath("") + "/image_" + trenutna_slika + ".png");
         image(img, 0, 0, 1240, 1753);
   } 
 
   popMatrix();
 }
- 
+
+//ove dvije fje služe za klasu ScrollRect
 void mousePressed() {
   flag = true;
   scrollRect.mousePressedRect();
@@ -224,24 +214,30 @@ void mouseReleased() {
   scrollRect.mouseReleasedRect();
 }
 
+//fja koja se poziva kada korisnik treba odabrati put za spremanje foldera
 void fileSelected(File selection) {
   if (selection == null) {
     println("Window was closed or the user hit cancel.");
   } else {
+    //absPath je put koji je korisnik odabrao za spremanje slika
     absPath = selection.getAbsolutePath();
     folder = new File(absPath);
     if (!folder.exists())
        folder.mkdir();
     
+    //u txt file za taj predmet upisujemo put gdje ce se spremati svi folderi s potpisima
+    //i broj studenata po stranicama - u obliku "30 10"
     String[] lines = new String[2];
     lines[0] = absPath;
     lines[1] = br_studenata;
     
+    //te txt dokumente spremamo u data
     File f = new File(dataPath("") + "/" + imeNovogPredmeta + ".txt");
     saveStrings(f, lines);
   }
 }
 
+//fja koja se poziva kada korisnik treba odabrati popis u pdf obliku
 void fileSelected2(File selection) {
   if (selection == null) {
     println("Window was closed or the user hit cancel.");
@@ -249,12 +245,12 @@ void fileSelected2(File selection) {
   else {
     println("User selected " + selection.getAbsolutePath());
 
+    //kad god biramo novi popis, moramo resetirati stare globalne varijable
     trenutna_slika = 1;
     trenutni_red = 2;
 
     pdf = selection.getAbsolutePath();
     
-    //size(2480, 3507); 
     PDDocument document = null;
     try
     {
@@ -262,7 +258,7 @@ void fileSelected2(File selection) {
         duljina = 0;
       
         document = PDDocument.load( new File(pdf) );
-        printer = new SaveImagesInPdf();
+        printer = new SaveImagesInPdf(dataPath(""));
         printer.imageNumber = 1;
         
         int pageNum = 0;
@@ -290,45 +286,58 @@ void fileSelected2(File selection) {
   
   String[] lines = loadStrings(dataPath("") + "/" + imeNovogPredmeta + ".txt");
   
+  //čim se odabere novi popis moramo spremiti i novi absPath gdje ćemo spremati
+  //foldere s potpisima, zato mora biti unešeno ime predmeta za koji se unosi popis
   absPath = lines[0];
   
   obrada_slike = true;
   klik = 0;
-  //sad imamo slike spremljene na D:/image_1, ... i zarotirane su
-
+  //sad imamo slike spremljene na odabranom pathu i zarotirane su
+  //rotacija je napravljena odmah u klasi saveImagesInPDF.java
 }
 
 
 //druga verzija bez prepoznavanje linija i automatskog rezanja -- rezanje klikom
 
+//fja koja reze potpise sa slike
 void izreziKlikanjem(Point gornji_lijevi, Point gornji_lijevi2, int duljina, int visina)
 {
   String[] lines = loadStrings(dataPath("") + "/" + imeNovogPredmeta + ".txt");
   boolean flag = true;
   int i = 0;
   
+  //lines[1] = "30 10" -- brojevi = [30, 10]
+  //trenutna_slika ide od 1
   String[] brojevi = lines[1].split(" ");
   int br = Integer.parseInt(brojevi[trenutna_slika - 1]);
   
+  //citamo sa ove stranice dok god ne pročitamo obje tablice
+  //ili sve studente iz datoteke
   while(trenutni_red < lines.length && i < br)
   {
+    //lijeva tablica
     if(flag)
     {
       if (absPath != null){
+       //lines[trenutni_red] u ostalim retcima se nalaze imena studenata
+       //prvo za svakog studenda pravimo folder s njegovim imenom, ako već ne postoji
        File f = new File(absPath + "/" + lines[trenutni_red]);
-       if (!f.exists()) f.mkdir();
+       if (!f.exists()) 
+         f.mkdir();
        
+       //img je slika iz naseg pdfa - iz nje rezemo potpise
        PImage img2 = img.get((int)(gornji_lijevi.getX()), (int)(gornji_lijevi.getY()+ i * visina), duljina, visina);     
        i++;
-       //println ("predavanje" + predavanje_br);
        img2.save(absPath + "/" + lines[trenutni_red] + "/" + predavanje_br +".png");
-       if(i >= br) {
+       if(i == br) {
+         //ako smo procitali cijelu lijevu tablicu, prelazimo na desnu
          flag = false;
          i = 0;
        }
-       }  
+     }
     }
     
+    //čitamo desnu tablicu
     else if(!flag)
     {
        if (absPath != null){
@@ -338,10 +347,6 @@ void izreziKlikanjem(Point gornji_lijevi, Point gornji_lijevi2, int duljina, int
        PImage img2 = img.get((int)(gornji_lijevi2.getX()), (int)(gornji_lijevi2.getY() + i * visina), duljina, visina);   
        i++;
        img2.save(absPath + "/" + lines[trenutni_red] + "/" + predavanje_br +".png");
-       
-       /*if(i >= br){
-         flag = true;
-       }*/
        }  
     }
     
@@ -352,6 +357,8 @@ void izreziKlikanjem(Point gornji_lijevi, Point gornji_lijevi2, int duljina, int
 }
 
 void mouseClicked(){
+  //map preslikava s naših dimenzija screen-a u prave dimenzije na slici --
+  //slika je veca od size
   int x = (int)map((int)mouseX, 0, (int)width, 0, 2480);
   int y = (int)map((int)mouseY - (int)newYValue, 0, (int)height, 0, 3507);
   if (brojac == 1) gornji_lijevi = new Point(x, y);
@@ -365,9 +372,12 @@ void mouseClicked(){
     
     String[] lines = loadStrings(dataPath("") + "/" + imeNovogPredmeta + ".txt");
   
+    //duljine i visine tražimo samo na prvoj slici za svaki od učitanih dokumenata
+    //zato uzimamo ovaj br [0] jer je tu zapisan broj redaka na 1. stranici
+    //lines[1] = "30 10"
     int br = Integer.parseInt((lines[1].split(" "))[0]);
 
-    
+    // ako duljina i visina nisu vec izracunate, izracunaj ih
     if (duljina == 0)
         duljina = (int)(dist((float)gornji_lijevi.getX(), (float)gornji_lijevi.getY(), 
                       (float)gornji_desni.getX(), (float)gornji_desni.getY()));
@@ -382,12 +392,19 @@ void mouseClicked(){
     
     gornji_lijevi2 = new Point((int)gornji_lijevi.getX() + d, (int)gornji_lijevi.getY());
 
-    img = loadImage("C:/Users/Ema/Desktop/projekt/data/image_" + trenutna_slika + ".png");
-    izreziKlikanjem(gornji_lijevi, gornji_lijevi2, duljina, visina);
+    File f = new File(dataPath("") + "/image_" + trenutna_slika + ".png");
+    if (f.exists()){
+      img = loadImage(dataPath("") + "/image_" + trenutna_slika + ".png");
+      izreziKlikanjem(gornji_lijevi, gornji_lijevi2, duljina, visina);
+    }
     
     brojac = 0;
     trenutna_slika++;
-    //loop();
+    if (trenutna_slika == printer.imageNumber){
+      background(255);
+      stroke(color(255,0,0));
+      text("Gotovo rezanje!", 200, 200);
+    }
   }
   brojac++;
   stroke(color(255,0,0));
@@ -395,6 +412,7 @@ void mouseClicked(){
   rect(mouseX - 5, mouseY - 5, 10, 10);
 }
 
+//s obzirom koje smo točke poklikali, rotiramo sliku u slučaju da je scan bio neravan
 void rotiraj()
 {
   PVector v1 = new PVector((int)gornji_lijevi.getX(), (int)gornji_lijevi.getY());
@@ -407,16 +425,17 @@ void rotiraj()
   v2.y -= v1.y;
   v1.x = 0;
   v1.y = 10;
+  //angle between uzima kut izmedu vektora koji su odredeni točkom (0,0) i 
+  //tockama kojima smo ih odredili
+  //zato translatiramo u prvu točku, da dobijemo pravi kut koji nam treba
   float kut = PVector.angleBetween(v1, v2);
-  //println(v1.x + " " + v1.y);
-  //println(v2.x + " " + v2.y);
-  //println(kut);
   
   popMatrix();
   
-  File file = new File("C:/Users/Ema/Desktop/projekt/data/image_1.png");
+  File file = new File(dataPath("") + "/image_1.png");
   
   BufferedImage sl_rot = null;
+  
   try {
     sl_rot = ImageIO.read(file);
     } catch (IOException e) {}
@@ -424,8 +443,11 @@ void rotiraj()
     BufferedImage rotated = new BufferedImage(sl_rot.getWidth(), sl_rot.getHeight(), BufferedImage.TYPE_INT_ARGB);
                   
     AffineTransform xform = new AffineTransform();
-    if(gornji_lijevi.getX() > donji_lijevi.getX()) xform.rotate(-kut, gornji_lijevi.getX(), gornji_lijevi.getY());
-    else xform.rotate(kut, gornji_lijevi.getX(), gornji_lijevi.getY());
+    
+    if(gornji_lijevi.getX() > donji_lijevi.getX()) 
+      xform.rotate(-kut, gornji_lijevi.getX(), gornji_lijevi.getY());
+    else 
+      xform.rotate(kut, gornji_lijevi.getX(), gornji_lijevi.getY());
     
     Graphics2D g = (Graphics2D) rotated.createGraphics();
     g.drawImage(sl_rot, xform, null);
@@ -437,6 +459,7 @@ void rotiraj()
 
 }
 
+//fja koja ucita sliku s potpisom i vrati je li ćelija prazna ili stvarno postoji potpis u njoj
 boolean imaLiPotpisa(PImage img)
 {
     float avg_red, avg_green, avg_blue, red = 0, green = 0, blue = 0;
@@ -457,21 +480,10 @@ boolean imaLiPotpisa(PImage img)
    else return false;
 }
 
-boolean sadrzi(String[] s, int br){
-  
-  for (int i = 0; i < s.length; i++){
-    int b = Integer.parseInt(s[i]);
-    if (b == br)
-        return true;
-  }
-   return false;
-    
-}
-
-
-
+//------------------------------------------------------------------------
 // rotacija je u novoj verziji napravljena unutar klase SaveImagesInPdf
 // tako da ni ovo više ne koristimo
+
 void obradaSlike(){
   
   //ovo je samo rotacija slika
@@ -832,47 +844,6 @@ void izrezi(PImage img)
      PImage img2 = img.get((int) (x_max - duljina_celije), (int) (prva.start.y + i * visina_celije), duljina_celije, visina_celije);
      img2.save(absPath + "/student" + (i + broj_redova) + "/" + predavanje_br + ".png");
        
-     }  
-  }
-}
-
-void izreziKlikanjem(Point gornji_lijevi, Point gornji_lijevi2, int duljina, int visina)
-{
-  String[] lines = loadStrings(dataPath("") + "/" + imeNovogPredmeta + ".txt");
-  
-  int br = Integer.parseInt(lines[1]);
-
-  for(int i = 0; i < br; i++)
-  {
-    if (absPath != null){
-     File f = new File(absPath + "/student" + (i+1));
-     if (!f.exists())
-     {
-       f.mkdir();
-    
-     //PImage img1 = img.get((int)gornji_lijevi.getX(), (int)gornji_lijevi.getY() + i * visina, duljina, visina); 
-     //img1.save(absPath + "/student" + (i+1) + "/ime" + predavanje_br + ".png");
-     }
-     
-     PImage img2 = img.get((int)(gornji_lijevi.getX()), (int)(gornji_lijevi.getY()+ i * visina), duljina, visina);     
-     img2.save(absPath + "/student" + (i+1) + "/" + predavanje_br +".png");
-     }  
-  }
-  
-  for (int i = 0; i < br; i++)
-  {
-     if (absPath != null){
-     File f = new File(absPath + "/student" + (i+31));
-     if (!f.exists())
-     {
-       f.mkdir();
-    
-     //PImage img1 = img.get((int)gornji_lijevi2.getX(), (int)gornji_lijevi2.getY() + i * visina, duljina, visina); 
-     //img1.save(absPath + "/student" + (i+31) + "/ime" + predavanje_br + ".png");
-     }
-     
-     PImage img2 = img.get((int)(gornji_lijevi2.getX()), (int)(gornji_lijevi2.getY() + i * visina), duljina, visina);     
-     img2.save(absPath + "/student" + (i+31) + "/" + predavanje_br +".png");
      }  
   }
 }

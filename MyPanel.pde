@@ -37,8 +37,8 @@ public class MyPanel extends JPanel {
     dodajPredmet = new JButton ("Dodaj novi kolegij");
     
     label = new JLabel("Redni broj na popisu odabranog studenta:");
-    label2 = new JLabel("Unosite popis za predavanje redni broj: ");
-    label3 = new JLabel("Broj studenata u prvom stupcu:");
+    label2 = new JLabel("Redni broj predavanja: ");
+    label3 = new JLabel("Broj redaka po svakoj stranici:");
     label4 = new JLabel("Ime kolegija:");
     label5 = new JLabel("Ime i prezime:");
     
@@ -201,7 +201,7 @@ public class MyPanel extends JPanel {
     brStudenata.setBounds(215, 60, 125, 20);
     
     label2.setBounds(25, 95, 250,20);
-    predavanje.setBounds(255, 95, 125, 20);
+    predavanje.setBounds(200, 95, 125, 20);
     
     unesi.setBounds(25, 130, 210, 20);
     slika.setBounds(260,130, 210, 20);
@@ -269,7 +269,6 @@ class ispisiClick implements ActionListener
 
 //student se dodaje nakon sto txt file vec postoji
 // prvo se unese ime kolegija i podaci poput koliko ima redaka u tablici
-// odvojeno tabovima, to je u prvom retku txt file
 // zatim se dodaju studenti svaki u novi red -- redom po popisu
 class dodajNovogStudenta implements ActionListener
 {
@@ -283,7 +282,7 @@ class dodajNovogStudenta implements ActionListener
      //sad koristimo saveStrings, ali s obzirom da to prepiše preko
      // postojećeg dokumenta, morali smo prvo spremiti sve što smo imali prije
      
-     //tu cemo koristiti abs path za file
+     //tu cemo koristiti data za spremanje txt file-ova
      File f = new File(dataPath("") + "/" + imeNovogPredmeta + ".txt");
      saveStrings(f, lines);
   }
@@ -293,7 +292,6 @@ class dodajPredmet implements ActionListener
 {
   public void actionPerformed(ActionEvent e)
   {
-     //File f = new File("C:/Users/emdogan/Downloads/projekt/data/" + imeNovogPredmeta + ".txt");
      File f = new File(dataPath("") + "/" + imeNovogPredmeta + ".txt");
      try{
        f.createNewFile();

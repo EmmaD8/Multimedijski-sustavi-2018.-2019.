@@ -1,5 +1,5 @@
-C:\Users\Ema\Desktop\projekt\data\rp1
-30
+C:\Users\Ema\Desktop\projekt\rp1
+33
 tadej barovic
 matej blazeka
 filip gomercic
@@ -58,6 +58,7 @@ martina novotny2
 patricia matakovic
 margareta gredecki
 josip misic
--
--2
 jelena kovacic
+ivo brncic
+emma konjevic
+mia delin

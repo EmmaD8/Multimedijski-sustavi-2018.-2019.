@@ -29,13 +29,16 @@ import java.awt.geom.AffineTransform;
 
 class SaveImagesInPdf extends PDFStreamEngine
 {
+  public String path;
   /**
    * Default constructor.
    *
    * @throws IOException If there is an error loading text stripper properties.
    */
-  public SaveImagesInPdf() throws IOException
+  public SaveImagesInPdf(String put) throws IOException
   {
+    path = put;
+    System.out.println(path);
   }
   
   
@@ -73,9 +76,8 @@ class SaveImagesInPdf extends PDFStreamEngine
               BufferedImage bImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
               bImage = image.getImage();
               
-              try{                
-                  //File file = new File("C:/Users/emdogan/Downloads/image_" + imageNumber + ".png");
-                  File file = new File("C:/Users/Ema/Desktop/projekt/data/image_" + imageNumber + ".png");
+              try{
+                  File file = new File(path + "/image_" + imageNumber + ".png");
                 // rotiramo sliku zato što bude položena kad ju izvadimo iz PDF-a
                   
                 int w = bImage.getWidth();
